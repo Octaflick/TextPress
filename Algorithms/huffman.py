@@ -72,13 +72,88 @@ class HuffmanDecoder:
         return "".join(decoded)
 
 
+class HuffmanEncoder:
+    """Encodes data using Huffman coding."""
+
+    def __init__(self) -> None:
+        self.code_table: dict[str, str] = {}
+        self.root: Optional[HuffmanNode] = None
+
+    def _build_codes(self, node: Optional[HuffmanNode], prefix: str = "") -> None:
+        """Recursively traverse the tree to build the code table."""
+        if node is None:
+            return
+        if node.is_leaf():
+            # Edge case: single unique character gets code "0"
+            self.code_table[node.ch] = prefix if prefix else "0"
+            return
+        self._build_codes(node.left, prefix + "0")
+        self._build_codes(node.right, prefix + "1")
+
+    def build_from_data(self, data: str) -> None:
+        """Build frequency table and Huffman tree from raw string data."""
+        frequencies: dict[str, int] = {}
+        for ch in data:
+            frequencies[ch] = frequencies.get(ch, 0) + 1
+
+        builder = HuffmanTreeBuilder()
+        self.root = builder.build(frequencies)
+        self.code_table = {}
+        self._build_codes(self.root)
+
+    def build_from_bytes(self, data: bytes) -> None:
+        """Build frequency table and Huffman tree from raw bytes."""
+        frequencies: dict[str, int] = {}
+        for byte in data:
+            ch = chr(byte)
+            frequencies[ch] = frequencies.get(ch, 0) + 1
+
+        builder = HuffmanTreeBuilder()
+        self.root = builder.build(frequencies)
+        self.code_table = {}
+        self._build_codes(self.root)
+
+    def encode(self, data: str) -> str:
+        """Encode a string into a Huffman-coded bit string."""
+        if not self.code_table:
+            raise ValueError("Encoder not initialized. Call build_from_data first.")
+        return "".join(self.code_table[ch] for ch in data)
+
+    def encode_bytes(self, data: bytes) -> str:
+        """Encode bytes into a Huffman-coded bit string."""
+        if not self.code_table:
+            raise ValueError("Encoder not initialized. Call build_from_bytes first.")
+        return "".join(self.code_table[chr(byte)] for byte in data)
+
+    def get_frequency_table(self) -> dict[str, int]:
+        """Return the frequency table used for encoding."""
+        if self.root is None:
+            return {}
+        freqs: dict[str, int] = {}
+        self._collect_frequencies(self.root, freqs)
+        return freqs
+
+    def _collect_frequencies(self, node: Optional[HuffmanNode], freqs: dict[str, int]) -> None:
+        if node is None:
+            return
+        if node.is_leaf() and node.ch is not None:
+            freqs[node.ch] = node.freq
+            return
+        self._collect_frequencies(node.left, freqs)
+        self._collect_frequencies(node.right, freqs)
+
+
 if __name__ == "__main__":
-    frequencies = {"A": 1, "B": 1, "C": 1}
+    # Demo: encode and decode
+    sample = "ABAABABAAB"
+    encoder = HuffmanEncoder()
+    encoder.build_from_data(sample)
 
-    builder = HuffmanTreeBuilder()
-    root = builder.build(frequencies)
+    print("Code table:", encoder.code_table)
+    encoded_bits = encoder.encode(sample)
+    print("Encoded:", encoded_bits)
 
-    decoder = HuffmanDecoder(root)
-    encoded = "01011"
-
-    print(decoder.decode(encoded))
+    decoder = HuffmanDecoder(encoder.root)
+    decoded = decoder.decode(encoded_bits)
+    print("Decoded:", decoded)
+    print("Match:", sample == decoded)
