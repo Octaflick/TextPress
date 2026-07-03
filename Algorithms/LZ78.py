@@ -38,7 +38,7 @@ def compress(text: str) -> List[LZ78Token]:
     if current:
         # Traditional LZ78 emits the final phrase as (index, "") when the
         # input ends exactly on a dictionary entry.
-        tokens.append(LZ78Token(dictionary[current[:-1]], current[-1]))
+        tokens.append(LZ78Token(dictionary[current], ""))
 
     return tokens
 

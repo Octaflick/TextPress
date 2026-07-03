@@ -10,6 +10,7 @@ Usage:
 Supported formats:
     .huff   — Huffman coding
     .lz78   — LZ78 dictionary compression
+    .hlz    — adaptive Huffman-LZ78 hybrid
 """
 
 from __future__ import annotations
@@ -17,6 +18,10 @@ from __future__ import annotations
 import sys
 import os
 import time
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
 
 # Add Algorithms directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "Algorithms"))
@@ -80,6 +85,7 @@ def cmd_help():
     print(f"  {Colors.BOLD}SUPPORTED FORMATS{Colors.RESET}")
     print(f"    {Colors.YELLOW}.huff{Colors.RESET}    Huffman coding")
     print(f"    {Colors.YELLOW}.lz78{Colors.RESET}    LZ78 dictionary compression")
+    print(f"    {Colors.YELLOW}.hlz{Colors.RESET}     Adaptive Huffman-LZ78 hybrid")
     print()
 
     print(f"  {Colors.BOLD}EXAMPLES{Colors.RESET}")
@@ -89,8 +95,11 @@ def cmd_help():
     print(f"    {Colors.DIM}# Compress with LZ78{Colors.RESET}")
     print(f"    {Colors.CYAN}zipcompress compress input.txt output.lz78{Colors.RESET}")
     print()
+    print(f"    {Colors.DIM}# Compress with Huffman-LZ78 hybrid{Colors.RESET}")
+    print(f"    {Colors.CYAN}zipcompress compress input.txt output.hlz{Colors.RESET}")
+    print()
     print(f"    {Colors.DIM}# Decompress{Colors.RESET}")
-    print(f"    {Colors.CYAN}zipcompress decompress output.lz78 restored.txt{Colors.RESET}")
+    print(f"    {Colors.CYAN}zipcompress decompress output.hlz restored.txt{Colors.RESET}")
     print()
 
 

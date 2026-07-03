@@ -4,8 +4,9 @@ compressor.py — File-level compression/decompression engine for zipcompress.
 Supported algorithms:
     - Huffman coding  (extension: .huff, algo id: 0x01)
     - LZ78            (extension: .lz78, algo id: 0x02)
+    - Huffman-LZ78    (extension: .hlz, algo id: 0x03)
 
-Binary file format (.huff / .lz78):
+Binary file format (.huff / .lz78 / .hlz):
     [4 bytes]  magic: b"ZPCM"
     [1 byte]   algorithm id
     [4 bytes]  original file size (big-endian)
@@ -24,21 +25,25 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from huffman import HuffmanEncoder, HuffmanDecoder, HuffmanTreeBuilder
 from LZ78 import compress as lz78_compress, decompress as lz78_decompress, LZ78Token
+from huffman_lz78 import compress as hybrid_compress, decompress as hybrid_decompress
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 
 MAGIC = b"ZPCM"
 ALGO_HUFFMAN = 0x01
 ALGO_LZ78 = 0x02
+ALGO_HUFFMAN_LZ78 = 0x03
 
 EXTENSION_TO_ALGO = {
     ".huff": ALGO_HUFFMAN,
     ".lz78": ALGO_LZ78,
+    ".hlz": ALGO_HUFFMAN_LZ78,
 }
 
 ALGO_NAMES = {
     ALGO_HUFFMAN: "Huffman",
     ALGO_LZ78: "LZ78",
+    ALGO_HUFFMAN_LZ78: "Huffman-LZ78 Hybrid",
 }
 
 
@@ -135,6 +140,18 @@ def _lz78_decompress_payload(payload: bytes) -> bytes:
     return text.encode("utf-8")
 
 
+# -- Huffman-LZ78 hybrid file helpers --
+
+def _hybrid_compress_payload(data: bytes) -> bytes:
+    """Compress raw bytes using the adaptive Huffman-LZ78 hybrid."""
+    return hybrid_compress(data)
+
+
+def _hybrid_decompress_payload(payload: bytes) -> bytes:
+    """Decompress Huffman-LZ78 hybrid payload back to original bytes."""
+    return hybrid_decompress(payload)
+
+
 # ── Public API ─────────────────────────────────────────────────────────────────
 
 def detect_algorithm(filepath: str) -> int:
@@ -171,6 +188,8 @@ def compress_file(input_path: str, output_path: str) -> dict:
         payload = _huffman_compress_payload(data)
     elif algo_id == ALGO_LZ78:
         payload = _lz78_compress_payload(data)
+    elif algo_id == ALGO_HUFFMAN_LZ78:
+        payload = _hybrid_compress_payload(data)
     else:
         raise ValueError(f"Unsupported algorithm id: {algo_id}")
 
@@ -224,6 +243,8 @@ def decompress_file(input_path: str, output_path: str) -> dict:
         data = _huffman_decompress_payload(payload)
     elif algo_id == ALGO_LZ78:
         data = _lz78_decompress_payload(payload)
+    elif algo_id == ALGO_HUFFMAN_LZ78:
+        data = _hybrid_decompress_payload(payload)
     else:
         raise ValueError(f"Unsupported algorithm id: {algo_id}")
 

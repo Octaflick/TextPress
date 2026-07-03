@@ -13,8 +13,11 @@ python zipcompress.py compress input.txt output.huff
 # Compress a file using LZ78
 python zipcompress.py compress input.txt output.lz78
 
+# Compress a file using the Huffman-LZ78 hybrid
+python zipcompress.py compress input.txt output.hlz
+
 # Decompress
-python zipcompress.py decompress output.huff restored.txt
+python zipcompress.py decompress output.hlz restored.txt
 
 # Show help
 python zipcompress.py help
@@ -36,6 +39,7 @@ The **algorithm is auto-detected** from the output file extension:
 |---|---|
 | `.huff` | Huffman coding |
 | `.lz78` | LZ78 dictionary compression |
+| `.hlz` | Adaptive Huffman-LZ78 hybrid |
 
 ---
 
@@ -47,6 +51,7 @@ zipcompression/
 ├── Algorithms/
 │   ├── huffman.py              # Huffman coding (encoder + decoder)
 │   ├── LZ78.py                 # LZ78 dictionary compression
+│   ├── huffman_lz78.py         # Adaptive Huffman-LZ78 hybrid
 │   ├── compressor.py           # File-level compress/decompress engine
 │   └── huffman.cpp             # C++ Huffman (WIP)
 └── README.md
@@ -61,6 +66,9 @@ Assigns shorter binary codes to more frequent bytes. Best for files with uneven 
 
 ### LZ78
 Builds a dictionary of repeated phrases on the fly. Best for files with lots of repeated text patterns.
+
+### Huffman-LZ78 Hybrid
+Tries raw, Huffman, byte-level LZ78, LZ78-then-Huffman, and Huffman-then-LZ78 payloads, then stores the smallest lossless result.
 
 ### Compressed File Format
 All compressed files use a binary format with:
