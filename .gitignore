@@ -1,2 +1,3 @@
-*/Algorithms/__pycache__
-*/.agents
+/Algorithms/__pycache__/*
+/.agents
+.DS_Store
