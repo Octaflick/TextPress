@@ -1,10 +1,10 @@
-# Compression-WIP- (zipcompress)
+# TextPress
 
 A **CLI-based file compression tool** built with Python, supporting Huffman coding and LZ78 dictionary compression.
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # Compress a file using Huffman coding
@@ -43,22 +43,6 @@ The **algorithm is auto-detected** from the output file extension:
 
 ---
 
-## 📁 Project Structure
-
-```
-zipcompression/
-├── zipcompress.py              # CLI entry point
-├── Algorithms/
-│   ├── huffman.py              # Huffman coding (encoder + decoder)
-│   ├── LZ78.py                 # LZ78 dictionary compression
-│   ├── huffman_lz78.py         # Adaptive Huffman-LZ78 hybrid
-│   ├── compressor.py           # File-level compress/decompress engine
-│   └── huffman.cpp             # C++ Huffman (WIP)
-└── README.md
-```
-
----
-
 ## 🔧 How It Works
 
 ### Huffman Coding
@@ -81,4 +65,5 @@ All compressed files use a binary format with:
 
 ## 👥 Contributors
 
-- Team of 2 — collaborative CLI compression project
+[Jinisha Tejura ](https://github.com/jinishatejura)
+[Vedant Tapkir]((https://github.com/OctaFlick))
